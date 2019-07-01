@@ -17,26 +17,22 @@ class TCNo
      */
     public static function checksum($identityPrefix)
     {
-        if (strlen((string)$identityPrefix) !== 9) {
+        $tcKimlikNo = strval($identityPrefix);
+
+        if (strlen(strval($tcKimlikNo)) != 9) {
             throw new InvalidArgumentException('Argument should be an integer and should be 9 digits.');
         }
 
-        $oddSum = 0;
-        $evenSum = 0;
-
-        $identityArray = array_map('intval', str_split($identityPrefix)); // Creates array from int
-        foreach ($identityArray as $index => $digit) {
-            if ($index % 2 == 0) {
-                $evenSum += $digit;
-            } else {
-                $oddSum += $digit;
-            }
+        if (! preg_match('/^[1-9]{1}[0-9]{8}$/', $tcKimlikNo)) {
+            throw new InvalidArgumentException('Argument should be a valid identy prefix.');
         }
 
-        $tenthDigit = (7 * $evenSum - $oddSum) % 10;
-        $eleventhDigit = ($evenSum + $oddSum + $tenthDigit) % 10;
+        $oddDigitsSum = $tcKimlikNo[0] + $tcKimlikNo[2] + $tcKimlikNo[4] + $tcKimlikNo[6] + $tcKimlikNo[8];
+        $evenDigitsSum = $tcKimlikNo[1] + $tcKimlikNo[3] + $tcKimlikNo[5] + $tcKimlikNo[7];
+        $digit10 = ($oddDigitsSum * 7 - $evenDigitsSum) % 10;
+        $digit11 = ($oddDigitsSum + $evenDigitsSum + $digit10) % 10;
 
-        return $tenthDigit . $eleventhDigit;
+        return $digit10 . $digit11;
     }
 
     /**
